@@ -1,112 +1,77 @@
-titanic_tr <- read.csv(file.choose())
 titanic_te <- read.csv(file.choose())
-
-#####1.Soru########
-ncol(titanic_tr)
-nrow(titanic_tr)
-head(titanic_tr)
+titanic_tr <- read.csv(file.choose())
+######################################
+## titanic_tr verisindeki numerik degiskenler
 str(titanic_tr)
-summary(titanic_tr)
+## 1.,2.,3.,6.,7.,8.,10. degiskenler numerik
 
-#####2.Soru#####
-str(titanic_te)     #veri tiplerini gÃ¶rmek icin
+plot(titanic_tr[,c(1:3,6:8,10)],
+     main= "titanic_tr veri setindeki numerik degiskenlerin korelasyonlari",
+     col= "blue")
+## Age ve Fare degiskenleri disindaki numerik degiskenler aslýnda factor degiskenleridir. 
+## Bu nedenle grafik korelasyonu iyi temsil etmiyor.
+## Age ve Fare degiskenleri arasýdaki korelasyon;
 
+plot(titanic_tr[, c(6,10)], main= "yolcularin yaslari ve bilet fiyatlari arasýndaki iliski",
+     xlab= "Yolcularin Yaslari", ylab= "Bilet fiyatlari",
+     col= "red")
 
-#veri tiplerini faktore donustumek icin
-titanic_te$Sex = as.factor(titanic_te$Sex)
-titanic_te$Cabin = as.factor(titanic_te$Cabin)
-titanic_te$Embarked= as.factor(titanic_te$Embarked)
+## Örtüsen Histogram Grafikleri
+## Fare degiskeninin histogram grafigi ile gösterimi
+summary(titanic_tr$Fare)
+## Min. fiyat 0, max. fiyat ise 512'dir
+hist(titanic_tr$Fare,breaks = seq(0,515,5),
+     main ="yolcularin yaslari ve bilet fiyatlari ",
+     xlab= "Yolcularin Yaslari ve Biletlerinin Fiyatlari",
+     ylab = "Frekans",
+     col = rgb(200,0,0,155, maxColorValue = 255))
 
-str(titanic_te) #sonucu kontrol etmek icin
+## Age degiskeninin histogram grafigi ile gösterimi
+## Bu grafikte ana baslik ve eksen isimleri yazmak anlamsýz.
+summary(titanic_tr$Age)
+## Min. yas 0, max. yas ise 80'dir
+hist(titanic_tr$Age, 
+     breaks = seq(0,80,5), add=T,
+     col = rgb(0,0,200,155, maxColorValue = 255))
 
+## Boxplot
+boxplot(Fare ~ Age, data = titanic_tr,
+        main= "Yolcularin yaslarina göre bilet fiyatlari",
+        xlab = "Yaslar", ylab= "Bilet Fiyatlari",
+        col= "lightgreen")
 
-#hangi degiskenlerde eksik deger var gormek Ä±cÄ±n
-list_na <- colnames(titanic_te)[ apply(titanic_te, 2, anyNA) ]
-list_na
+boxplot(Age ~ Fare , data = titanic_tr, 
+        main= "Yolcularin bilet fiyatlarina göre yaslari",
+        xlab = "Bilet Fiyatlari", ylab = "Yaslar",
+        col= "lightblue")
 
-# Age ve Fare degiskenleriinde eksik degerler var
-
-ort_kadin <- mean(titanic_te$Age[titanic_te$Sex == "female"],na.rm = TRUE)
-#kadin yolcularin yas ortalamasÄ± yaklasik 30'dur
-ort_erkek <- mean(titanic_te$Age[titanic_te$Sex == "male"],na.rm = TRUE)
-#erkek yolcularin yas ortalamasÄ± yaklasik 30'dur
-
-#Yas ortalamasÄ± eksik olan kadin yolcular icin
-titanic_te$Age[titanic_te$Sex == "female"] <- 
-  replace(titanic_te$Age[titanic_te$Sex == "female"],
-   is.na(titanic_te$Age[titanic_te$Sex == "female"]), ort_kadin)
-titanic_te$Age[titanic_te$Sex == "female"]
-
-#Yas ortalamasÄ± eksik olan erkek yolcular icin
-titanic_te$Age[titanic_te$Sex == "male"] <- 
-  replace(titanic_te$Age[titanic_te$Sex == "male"],
-          is.na(titanic_te$Age[titanic_te$Sex == "male"]), ort_erkek)
-titanic_te$Age[titanic_te$Sex == "male"]
-
-sum(is.na(titanic_te$Fare))
-#Pclass degeri olan tek yolcu vardÄ±r.
-
-#Degeri olamayan yolcunun yasi ve bilet ucretinin bolumu
-titanic_te$Age[is.na(titanic_te$Fare)] / titanic_te$Pclass[is.na(titanic_te$Fare)]
-bolum <- titanic_te$Age[is.na(titanic_te$Fare)] / titanic_te$Pclass[is.na(titanic_te$Fare)]
-
-#eksik deger yerine sonucun yerlestirilmesi
-  replace(titanic_te$Fare,
-          is.na(titanic_te$Fare),bolum)
-titanic_te$Fare
-
-
-#####3.Soru######
-ncol(titanic_te)
-nrow(titanic_te)
-head(titanic_te)
-str(titanic_te)
-summary(titanic_te)
+#Age ve Embarked Degiskenleri Arasindaki Ýliski
+attach(titanic_tr)
+library(ggplot2)
+qplot(Embarked, Age, data = titanic_tr,
+      geom= "boxplot", fill= Embarked,
+      main = "Age ve Embarked Degiskenleri Arasýndaki Ýliski")
 
 
-str(titanic_tr)     #veri tiplerini gÃ¶rmek icin
+## Grafik Ýzgarasi
+par(mfrow = c(2,2))
 
+plot(titanic_tr[, c(6,10)], main= "yolcularin yaslari ve bilet fiyatlari arasýndaki iliski",
+     xlab= "Yolcularin Yaslari", ylab= "Bilet fiyatlari",
+     col= "red")
 
-#veri tiplerini faktore donustumek icin
-titanic_tr$Sex = as.factor(titanic_tr$Sex)
-titanic_tr$Cabin = as.factor(titanic_tr$Cabin)
-titanic_tr$Embarked= as.factor(titanic_tr$Embarked)
+hist(titanic_tr$Fare,breaks = seq(0,515,5),
+     main ="yolcularin yaslari ve bilet fiyatlari ",
+     xlab= "Yolcularin Yaslari ve Biletlerinin Fiyatlari",
+     ylab = "Frekans",
+     col = rgb(200,0,0,155, maxColorValue = 255))
 
+hist(titanic_tr$Age, 
+     breaks = seq(0,80,5), add=T,
+     col = rgb(0,0,200,155, maxColorValue = 255))
 
-str(titanic_tr) #sonucu kontrol etmek icin
-
-
-#hangi degiskenlerde eksik deger var gormek Ä±cÄ±n
-list_na2 <- colnames(titanic_tr)[ apply(titanic_tr, 2, anyNA) ]
-list_na2
-
-# Age degiskeninde eksik degerler var
-ort_kadin2 <- mean(titanic_tr$Age[titanic_tr$Sex == "female"],na.rm = TRUE)
-#kadin yolcularin yas ortalamasÄ± yaklasik 28'dir
-ort_erkek2 <- mean(titanic_tr$Age[titanic_tr$Sex == "male"],na.rm = TRUE)
-#erkek yolcularin yas ortalamasÄ± yaklasik 31'dir
-
-#Yas ortalamasÄ± eksik olan kadin yolcular icin
-titanic_tr$Age[titanic_tr$Sex == "female"] <- 
-  replace(titanic_tr$Age[titanic_tr$Sex == "female"],
-          is.na(titanic_tr$Age[titanic_tr$Sex == "female"]),ort_kadin2)
-titanic_tr$Age[titanic_tr$Sex == "female"]
-
-#Yas ortalamasÄ± eksik olan erkek yolcular icin
-titanic_tr$Age[titanic_tr$Sex == "male"] <- 
-  replace(titanic_tr$Age[titanic_tr$Sex == "male"],
-          is.na(titanic_tr$Age[titanic_tr$Sex == "male"]),ort_erkek2)
-titanic_tr$Age[titanic_tr$Sex == "male"]
-
-sum(is.na(titanic_tr$Fare))
-#Pclass degeri olan yolcu yoktur
-
-
-
-
-
-
-
-
-
+boxplot(Fare ~ Age, data = titanic_tr,
+        main= "Yolcularin yaslarina göre bilet fiyatlari",
+        xlab = "Yaslar", ylab= "Bilet Fiyatlari",
+        col= "lightgreen")
 
